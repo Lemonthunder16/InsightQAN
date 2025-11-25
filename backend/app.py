@@ -16,6 +16,9 @@ from db import get_db, KnowledgeBase, Document
 from sqlalchemy.orm import Session
 
 app = FastAPI(title="InsightQA Backend")
+from db import init_db
+
+init_db()
 
 # CORS for Streamlit
 app.add_middleware(
