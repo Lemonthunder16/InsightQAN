@@ -7,11 +7,11 @@ import uuid
 import mimetypes
 import shutil
 
-from . import parsers
-from .vectordb import add_chunks, _get_collection
-from .rag_agent import generate_testcases_rag
-from .selenium_generator import generate_selenium_script
-from .db import get_db, KnowledgeBase, Document
+import parsers
+from vectordb import add_chunks, _get_collection
+from rag_agent import generate_testcases_rag
+from selenium_generator import generate_selenium_script
+from db import get_db, KnowledgeBase, Document
 
 from sqlalchemy.orm import Session
 
