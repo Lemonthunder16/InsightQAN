@@ -1,49 +1,26 @@
 """
-Groq-based embedding wrapper.
-Fully replaces SentenceTransformer while keeping the same return format.
+Tiny local embedding model for Railway.
+No Groq embeddings (Groq does NOT support embedding models).
 """
 
-from __future__ import annotations
-
-import os
+from sentence_transformers import SentenceTransformer
+from functools import lru_cache
 import numpy as np
-from typing import List, Any
-from groq import Groq
+from typing import List
+
+# Very small model (~25 MB)
+MODEL_NAME = "all-MiniLM-L6-v2"
 
 
-# Get API key
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    raise RuntimeError("Missing GROQ_API_KEY environment variable.")
-
-# Create Groq client
-client = Groq(api_key=GROQ_API_KEY)
-
-# Choose a small + fast embedding model
-EMBED_MODEL = "nomic-embed-text-v1"   # Very fast, high-quality 768-dimensional vectors
+@lru_cache(maxsize=1)
+def _get_model() -> SentenceTransformer:
+    return SentenceTransformer(MODEL_NAME)
 
 
 def embed_texts(texts: List[str]) -> List[np.ndarray]:
-    """
-    Returns list of numpy arrays (one embedding per text),
-    exactly like SentenceTransformer encode().
-    """
-
-    # Groq supports batch embedding natively
-    resp = client.embeddings.create(
-        model=EMBED_MODEL,
-        input=texts
-    )
-
-    out = []
-    for item in resp.data:
-        # Convert python list -> numpy array for compatibility
-        vec = np.array(item.embedding, dtype=np.float32)
-        out.append(vec)
-
-    return out
+    model = _get_model()
+    return list(model.encode(texts, convert_to_numpy=True))
 
 
 def embed_text(text: str) -> np.ndarray:
-    """Single text embedding (matches original behavior)."""
     return embed_texts([text])[0]
