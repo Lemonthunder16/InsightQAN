@@ -3,14 +3,17 @@ from bs4 import BeautifulSoup
 from typing import Dict, Any, List
 import json
 
-from .llm_ollama import chat, DEFAULT_MODEL, LLMError
+from llm_ollama import chat, DEFAULT_MODEL, LLMError
 
 
 # -----------------------------
 # Extract HTML elements
 # -----------------------------
 def extract_ui_elements(html_path: str) -> List[Dict[str, str]]:
-    html = Path(html_path).read_text(encoding="utf-8")
+    if not Path(html_path).exists():
+        return []
+
+    html = Path(html_path).read_text(encoding="utf-8", errors="ignore")
     soup = BeautifulSoup(html, "html.parser")
 
     elements = []
@@ -25,7 +28,6 @@ def extract_ui_elements(html_path: str) -> List[Dict[str, str]]:
         })
 
     return elements
-
 
 
 # -----------------------------
@@ -72,14 +74,12 @@ Now output ONLY runnable Python code.
     return prompt.strip()
 
 
-
 # -----------------------------
 # Clean the code
 # -----------------------------
 def clean_code(raw: str) -> str:
     cleaned = raw.replace("```python", "").replace("```", "").strip()
     return cleaned
-
 
 
 # -----------------------------
@@ -104,7 +104,6 @@ Broken code:
     )
 
     return repaired
-
 
 
 # -----------------------------

@@ -1,6 +1,6 @@
 """
-Thin wrapper around sentence-transformers so the rest of the code
-doesn't care which model we use.
+Small embedding model for Railway-safe deployments.
+Uses a lightweight SentenceTransformer that downloads quickly.
 """
 
 from sentence_transformers import SentenceTransformer
@@ -11,7 +11,8 @@ import numpy as np
 
 @lru_cache(maxsize=1)
 def _get_model() -> SentenceTransformer:
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    # SMALL model (very fast + tiny download)
+    return SentenceTransformer("paraphrase-MiniLM-L3-v2")
 
 
 def embed_texts(texts: List[str]) -> list[np.ndarray]:
